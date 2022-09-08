@@ -2,7 +2,7 @@
 <html>
     <head> 
          <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-         <title>Приклад 05.04 -  3D текст з використанням двох текстур </title>
+         <title>Лабораторна робота 7</title>
 	     <script src="./js/three.js"></script>
 		 <script src="./js/TrackballControls.js"></script>		
 		 <script src="./js/dat.gui.js"></script>		
@@ -43,24 +43,9 @@
 				var fontLoader = new THREE.FontLoader();
 				let f;
 				fontLoader.load("./fonts/Roboto_Regular.json",function(tex){ 
-					f = tex;
-				// var  text_Geometry = new THREE.TextGeometry("Комп'ютерна графіка", {
-				// 	size: 20,
-				// 	height: 3,
-				// 	curveSegments: 6,
-				// 	bevelEnabled: true, 
-				// 	bevelThickness: 2, 
-				// 	bevelSize: 1, 
-				// 	material: 0, 
-				// 	extrudeMaterial: 1, 				
-				// 	font: tex
-				// });
-				
-				Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
-				Texture1.repeat.set( 0.05, 0.05 ); 
-				const material = new THREE.MeshBasicMaterial( { map: Texture1 } ); 
-				text = makeText('HELLO', 20, tex,material);
-				scene.add(text);
+					f = tex;	
+					text = makeText('HELLO', 20, f,makeOneTextureMaterial());
+					scene.add(text);
 				})
              
 
@@ -72,7 +57,7 @@
 
 				//SpotLight controls
 				const textControls = new function(){
-					this.texture = "BasicMaterial";
+					this.texture = 'Одна текстура';
 					this.fontSize = 20;
 					this.text = 'HELLO';
 				}();
@@ -80,24 +65,12 @@
 				gui.add(textControls, 'texture', ['Одна текстура', 'Дві текстури']).onChange(function (value) {
 					console.log(value);
 					switch (value){
-						case 'Одна текстура':{
-							Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
-							Texture1.repeat.set( 0.05, 0.05 ); 
-							const m = new THREE.MeshBasicMaterial( { map: Texture1 } ); 
-							text.material = m; 
+						case 'Одна текстура':{							 
+							text.material = makeOneTextureMaterial(); 
 							break;
 						}
-						case 'Дві текстури':{
-							Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
-							Texture1.repeat.set( 0.05, 0.05 );  
-							
-							// var ExtrTexture =  THREE.ImageUtils.loadTexture( 'images/sky.jpg' ); 
-							Texture2.wrapS = Texture2.wrapT  = THREE.RepeatWrapping;
-							Texture2.offset.set( 0, 0.7 );
-							Texture2.repeat.set( 0, 0.13 ); 
-				
-							const materials = [ new THREE.MeshBasicMaterial( { map: Texture1 } ), new THREE.MeshBasicMaterial( { map: Texture2 } ) ]; 
-							text.material=materials;
+						case 'Дві текстури':{							
+							text.material=makeTwoTexturesMaterial();
 							break;
 						}
 					}
@@ -153,6 +126,24 @@
 					text_Geometry.center();
 					text.name = 'text';
 					return text;					
+				}
+				function makeOneTextureMaterial(){
+					Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
+					Texture1.repeat.set( 0.05, 0.05 ); 
+					const m = new THREE.MeshBasicMaterial( { map: Texture1 } );
+					return m;
+				}
+				function makeTwoTexturesMaterial(){
+					Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
+					Texture1.repeat.set( 0.05, 0.05 );  
+					
+					// var ExtrTexture =  THREE.ImageUtils.loadTexture( 'images/sky.jpg' ); 
+					Texture2.wrapS = Texture2.wrapT  = THREE.RepeatWrapping;
+					Texture2.offset.set( 0, 0.7 );
+					Texture2.repeat.set( 0, 0.13 ); 
+		
+					const materials = [ new THREE.MeshBasicMaterial( { map: Texture1 } ), new THREE.MeshBasicMaterial( { map: Texture2 } ) ]; 
+					return materials;
 				}
 			
 };
