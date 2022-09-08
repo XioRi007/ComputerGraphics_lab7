@@ -77,25 +77,31 @@
 					
 				}); 
 				gui.add(textControls, 'fontSize', 10,30).onChange((val)=>{
+					//удаляем старый текст
 					scene.remove(scene.getObjectByName("text"));
+					//делаем новый
 					let m;
 					if(textControls.texture === 'Одна текстура'){
-						Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
-						Texture1.repeat.set( 0.05, 0.05 ); 
-						m = new THREE.MeshBasicMaterial( { map: Texture1 } ); 
+						m = makeOneTextureMaterial();
 					}
 					else{
-						Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
-						Texture1.repeat.set( 0.05, 0.05 );  
-						
-						// var ExtrTexture =  THREE.ImageUtils.loadTexture( 'images/sky.jpg' ); 
-						Texture2.wrapS = Texture2.wrapT  = THREE.RepeatWrapping;
-						Texture2.offset.set( 0, 0.7 );
-						Texture2.repeat.set( 0, 0.13 ); 
-			
-						m = [ new THREE.MeshBasicMaterial( { map: Texture1 } ), new THREE.MeshBasicMaterial( { map: Texture2 } ) ]; 
+						m = makeTwoTexturesMaterial();
 					}
 					text = makeText(textControls.text, val, f, m);
+					scene.add(text);
+				});
+				gui.add(textControls, "text").onFinishChange(function (value) {
+					//удаляем старый текст
+					scene.remove(scene.getObjectByName("text"));
+					//делаем новый
+					let m;
+					if(textControls.texture === 'Одна текстура'){
+						m = makeOneTextureMaterial();
+					}
+					else{
+						m = makeTwoTexturesMaterial();
+					}
+					text = makeText(value, textControls.fontSize, f, m);
 					scene.add(text);
 				});
 
