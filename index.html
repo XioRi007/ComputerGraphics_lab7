@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+         <title>Приклад 05.04 -  3D текст з використанням двох текстур </title>
+	     <script src="./js/three.js"></script>
+		 <script src="./js/TrackballControls.js"></script>		
+		 <script src="./js/dat.gui.js"></script>		
+	</head>
+	<body>
+        
+		<script>
+
+		
+		init();
+	
+			function init()
+			{
+
+				const Texture1 = THREE.ImageUtils.loadTexture( 'images/fire.jpg' ); 
+				const Texture2 =  THREE.ImageUtils.loadTexture( 'images/sky.jpg' ); 
+				
+				// створюємо рендер і задаємо розмір
+				var renderer = window.WebGLRenderingContext ? new THREE.WebGLRenderer({antialias:true}) : new THREE.CanvasRenderer();
+				renderer.setClearColor(new THREE.Color(0xEEEEEE));
+                renderer.setSize( window.innerWidth, window.innerHeight );
+				// додаємо вивід візуалізатора до html-елементу
+				document.body.appendChild( renderer.domElement );
+				// створюємо камеру
+				var camera = new THREE.PerspectiveCamera(45,window.innerWidth / window.innerHeight, 0.1,1000);
+				// створюємо сцену, яка буде містити всі наші елементи, такі як об'єкти, камери і джерела світла
+				var scene = new THREE.Scene();
+			
+				var controls = new THREE.TrackballControls( camera, renderer.domElement);
+            	var ambiLight = new THREE.AmbientLight(0x141414);
+		
+				scene.add(ambiLight);
+	
+				var light = new THREE.DirectionalLight();
+				light.position.set(0, 80, 200);
+				scene.add(light);
+				
+				var fontLoader = new THREE.FontLoader();
+				let f;
+				fontLoader.load("./fonts/Roboto_Regular.json",function(tex){ 
+					f = tex;
+				// var  text_Geometry = new THREE.TextGeometry("Комп'ютерна графіка", {
+				// 	size: 20,
+				// 	height: 3,
+				// 	curveSegments: 6,
+				// 	bevelEnabled: true, 
+				// 	bevelThickness: 2, 
+				// 	bevelSize: 1, 
+				// 	material: 0, 
+				// 	extrudeMaterial: 1, 				
+				// 	font: tex
+				// });
+				
+				Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
+				Texture1.repeat.set( 0.05, 0.05 ); 
+				const material = new THREE.MeshBasicMaterial( { map: Texture1 } ); 
+				text = makeText('HELLO', 20, tex,material);
+				scene.add(text);
+				})
+             
+
+				camera.position.x ==-50;
+				camera.position.y = 70;
+				camera.position.z = 200;
+				camera.lookAt(scene.position);
+
+
+				//SpotLight controls
+				const textControls = new function(){
+					this.texture = "BasicMaterial";
+					this.fontSize = 20;
+					this.text = 'HELLO';
+				}();
+				const gui = new dat.GUI();
+				gui.add(textControls, 'texture', ['Одна текстура', 'Дві текстури']).onChange(function (value) {
+					console.log(value);
+					switch (value){
+						case 'Одна текстура':{
+							Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
+							Texture1.repeat.set( 0.05, 0.05 ); 
+							const m = new THREE.MeshBasicMaterial( { map: Texture1 } ); 
+							text.material = m; 
+							break;
+						}
+						case 'Дві текстури':{
+							Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
+							Texture1.repeat.set( 0.05, 0.05 );  
+							
+							// var ExtrTexture =  THREE.ImageUtils.loadTexture( 'images/sky.jpg' ); 
+							Texture2.wrapS = Texture2.wrapT  = THREE.RepeatWrapping;
+							Texture2.offset.set( 0, 0.7 );
+							Texture2.repeat.set( 0, 0.13 ); 
+				
+							const materials = [ new THREE.MeshBasicMaterial( { map: Texture1 } ), new THREE.MeshBasicMaterial( { map: Texture2 } ) ]; 
+							text.material=materials;
+							break;
+						}
+					}
+					
+				}); 
+				gui.add(textControls, 'fontSize', 10,30).onChange((val)=>{
+					scene.remove(scene.getObjectByName("text"));
+					let m;
+					if(textControls.texture === 'Одна текстура'){
+						Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
+						Texture1.repeat.set( 0.05, 0.05 ); 
+						m = new THREE.MeshBasicMaterial( { map: Texture1 } ); 
+					}
+					else{
+						Texture1.wrapS = Texture1.wrapT = THREE.RepeatWrapping; 
+						Texture1.repeat.set( 0.05, 0.05 );  
+						
+						// var ExtrTexture =  THREE.ImageUtils.loadTexture( 'images/sky.jpg' ); 
+						Texture2.wrapS = Texture2.wrapT  = THREE.RepeatWrapping;
+						Texture2.offset.set( 0, 0.7 );
+						Texture2.repeat.set( 0, 0.13 ); 
+			
+						m = [ new THREE.MeshBasicMaterial( { map: Texture1 } ), new THREE.MeshBasicMaterial( { map: Texture2 } ) ]; 
+					}
+					text = makeText(textControls.text, val, f, m);
+					scene.add(text);
+				});
+
+
+
+	 			renderScene();
+
+				function renderScene() 
+				{
+ 
+					requestAnimationFrame( renderScene );
+					controls.update();
+					renderer.render( scene, camera );
+				}	
+				function makeText(t, size, font, material){
+					var  text_Geometry = new THREE.TextGeometry(t, {
+						size,
+						height: 3,
+						curveSegments: 6,
+						bevelEnabled: true, 
+						bevelThickness: 2, 
+						bevelSize: 1, 
+						material: 0, 
+						extrudeMaterial: 1, 				
+						font
+					});
+					text = new THREE.Mesh(text_Geometry, material );
+					text_Geometry.center();
+					text.name = 'text';
+					return text;					
+				}
+			
+};
+
+		</script>
+	</body>
+</html>
