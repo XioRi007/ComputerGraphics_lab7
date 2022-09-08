@@ -44,14 +44,14 @@
 				let f;
 				fontLoader.load("./fonts/Roboto_Regular.json",function(tex){ 
 					f = tex;	
-					text = makeText('HELLO', 20, f,makeOneTextureMaterial());
+					text = makeText('Комп\'ютерна графіка у WEB', 20, f,makeOneTextureMaterial());
 					scene.add(text);
 				})
              
 
 				camera.position.x ==-50;
 				camera.position.y = 70;
-				camera.position.z = 200;
+				camera.position.z = 250;
 				camera.lookAt(scene.position);
 
 
@@ -59,7 +59,7 @@
 				const textControls = new function(){
 					this.texture = 'Одна текстура';
 					this.fontSize = 20;
-					this.text = 'HELLO';
+					this.text = 'Комп\'ютерна графіка у WEB';
 				}();
 				const gui = new dat.GUI();
 				gui.add(textControls, 'texture', ['Одна текстура', 'Дві текстури']).onChange(function (value) {
